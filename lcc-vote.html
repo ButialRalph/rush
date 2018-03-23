@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html>
+<head>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons">
+        <link rel="stylesheet" href="https://unpkg.com/bootstrap-material-design@4.1.1/dist/css/bootstrap-material-design.min.css" integrity="sha384-wXznGJNEXNG1NFsbm0ugrLFMQPWswR3lds2VeinahP8N0zJw9VWSopbjv2x7WCvX" crossorigin="anonymous">
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://unpkg.com/popper.js@1.12.6/dist/umd/popper.js" integrity="sha384-fA23ZRQ3G/J53mElWqVJEGJzU0sTs+SvzG8fXVWP+kJQ1lwFAOkcUOysnlKJC33U" crossorigin="anonymous"></script>
+        <script src="https://unpkg.com/bootstrap-material-design@4.1.1/dist/js/bootstrap-material-design.js" integrity="sha384-CauSuKpEqAFajSpkdjv3z9t8E7RlpJ1UP0lKM/+NdtSarroVKu069AlsRPKkFBz9" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+    <title>
+    </title>
+</head>
+<body>
+    <div class="container-fluid" id="spa">
+        <div v-show="is_show_login" class="login" style="position: fixed;
+                margin: auto;
+                margin-top: 50px;
+                left: 34%;
+                padding: 150px;
+                background: #f3ecec;">
+            
+            <div>
+            <h3>La Concepcion College</h3>
+              <div class="form-group">
+                <label for="exampleInputEmail1">Email address</label>
+                <input v-model="user_name" type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+                <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+              </div>
+              <div class="form-group">
+                <label for="exampleInputPassword1">Password</label>
+                <input v-model="user_password" type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+              </div>
+              <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="exampleCheck1">
+              </div>
+              <button @click="onClickLogin" type="" class="btn btn-primary btn-raised">Login</button>
+            </div>
+        </div>
+        <div v-show="is_dashboard" style="height: 100vh; width: 100%">
+            <div class="row">
+              <div class="col-sm-2">
+                  <div style="height: 100vh; background: #1d395a; padding: 100px 0" class="sidebar">
+                      <ul class="list-group">
+                          <li style="color: #fff" @click="onActive(0)" class="list-group-item" v-bind:class="{active: array_link[0]}">Student Lists</li>
+                          <li style="color: #fff" @click="onActive(1)" class="list-group-item" v-bind:class="{active: array_link[1]}">Candidate</li>
+                          <li style="color: #fff" @click="onActive(2)" class="list-group-item" v-bind:class="{active: array_link[2]}">Add Admin</li>
+                          <li style="color: #fff" @click="onActive(3)" class="list-group-item" v-bind:class="{active: array_link[3]}">Results</li>
+                          <li style="color: #fff" @click="onActive(4)" class="list-group-item" v-bind:class="{active: array_link[4]}">Logout</li>
+                        </ul>
+                  </div>
+
+              </div>
+              <div class="col-sm-10">
+
+                <div v-show="is_student_page" style="padding: 100px">
+                    <h3>Student List</h3>
+                    <button type="button" class="btn btn-primary btn-raised" data-toggle="modal" data-target="#addStudent">
+                      Add
+                    </button>
+                    <table class="table">
+                      <thead class="thead-dark">
+                        <tr>
+                          <th scope="col">#</th>
+                          <th scope="col">Name</th>
+                          <th scope="col">Role</th>
+                          <th scope="col">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="student in students">
+                            <template>
+                                <th scope="row">{{ student.id_number }}</th>
+                                <td>{{ student.name}}</td>
+                                <td>{{ student.role }}</td>
+                                <td>
+                                <button class="btn btn-raised btn-info" @click="onShowmodal(student)">Edit</button>
+                                <button class="btn btn-raised btn-danger">Delete</button>
+                                </td>
+                            </template>
+                          
+                        </tr>
+                      </tbody>
+                    </table>
+
+
+                    <!-- add modal -->
+                    <div class="modal fade" id="addStudent" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Add User</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                            ...
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary">Save changes</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+
+                    <!-- edit student modal -->
+                    <div class="modal fade" id="editStudent" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel"></h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                            <template>
+                                  <label for="exampleSelect1" class="bmd-label-floating">Seet poistion for {{ selected_student.name }}</label>
+                                  <div v-show="false">
+                                      {{current_positon = '' }}
+                                  </div>
+                                <select v-model="current_positon" class="form-control" id="exampleSelect1">
+                                <option  v-for="position in positions" value="position.id">
+                                {{position.name}}
+                                </option>
+                            </select>
+                            </template>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" @click="setStudent(selected_student, current_positon)">Save changes</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                </div>
+
+                <div v-show="is_candidate_page" style="padding: 100px">
+                    <h3>Candidate List</h3>
+                    <button type="button" class="btn btn-primary btn-raised" data-toggle="modal" data-target="#addStudent">
+                      Add
+                    </button>
+                    <table class="table">
+                      <thead class="thead-dark">
+                        <tr>
+                          <th scope="col">#</th>
+                          <th scope="col">First</th>
+                          <th scope="col">Last</th>
+                          <th scope="col">Section</th>
+                          <th scope="col">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <th scope="row">1</th>
+                          <td>Mark</td>
+                          <td>Otto</td>
+                          <td>@mdo</td>
+                          <td>
+                              <button class="btn btn-raised btn-info">Edit</button>
+                              <button class="btn btn-raised btn-danger">Delete</button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <div class="modal fade" id="addStudent" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                            ...
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary">Save changes</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                </div>
+                 <div v-show="is_admin_page" style="padding: 100px">
+                    <h3>Add Admin</h3>
+                    <form>
+                      <!-- <div class="row"> -->
+                        <div class="form-group">
+                            <label for="exampleInputAdmin">Email address</label>
+                            <input type="email" class="form-control" id="exampleInputAdmin" aria-describedby="emailHelp" placeholder="Enter email">
+                            <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+                          </div>
+                          <div class="form-group">
+                            <label for="exampleInputPasswordAdmin">Password</label>
+                            <input type="password" class="form-control" id="exampleInputPasswordAdmin" placeholder="Password">
+                          </div>
+                          <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                          </div>
+                          <button @click="onClickLogin" type="" class="btn btn-primary btn-raised">Login</button>
+                        </div>
+                      <!-- </div> -->
+                    </form>
+
+                </div>
+              </div>
+            </div>
+
+        </div>
+
+        
+    </div>
+</body>
+</html>
+
+
+
+<script type="text/javascript">
+    var app = new Vue({
+        el: '#spa',
+        data: {
+            is_show_login: false,
+            is_dashboard: false,
+            is_student_page: true,
+            is_candidate_page: false,
+            is_admin_page: false,
+            user_name: '12345',
+            user_password: 'hello123',
+            array_link: [],
+            selected_student: {},
+            students: [],
+            candidates: [],
+            positions: []
+        },
+        mounted() {       
+            let self = this
+            self.getAllStudents() 
+            self.getAllPositions()
+            this.is_show_login = true
+            for (var i = 0; i <= 3; i++) {
+                console.log(i)
+                this.array_link[i] = false
+            }
+            console.log('ey')
+        },
+        methods: {
+            onClickLogin() {
+                let self = this
+                axios.post('https://vote-rush.herokuapp.com/api/login', {
+                    id_number: self.user_name,
+                    password: self.user_password
+                  })
+                  .then(function (response) {
+                    console.log(response.data.role)
+                    if (response.data.role === 'admin') {
+                        self.is_show_login = false
+                        self.is_dashboard = true
+                        return
+                    }
+                    alert('No Access/ No account found')
+                    
+                  })
+                  .catch(function (error) {
+                    alert('No Access/ No account found')
+                    console.log(error);
+                  });
+                
+            },
+            getAllStudents() {
+                let self = this
+                axios.get('https://vote-rush.herokuapp.com/api/list?model=User')
+                  .then(function (response) {
+                    console.log(response)
+                    self.students = response.data
+                  })
+                  .catch(function (error) {
+                    console.log(error);
+                  });
+            },
+            getAllCandidates() {
+                let self = this
+                axios.get('https://vote-rush.herokuapp.com/api/list?model=Candidate')
+                  .then(function (response) {
+                    console.log(response)
+                    self.candidates = response.data
+                  })
+                  .catch(function (error) {
+                    console.log(error);
+                  });
+            },
+            getAllPositions() {
+                let self = this
+                axios.get('https://vote-rush.herokuapp.com/api/list?model=Position')
+                  .then(function (response) {
+                    console.log(response)
+                    self.positions = response.data
+                  })
+                  .catch(function (error) {
+                    console.log(error);
+                  });
+
+            },
+            onShowmodal(params) {
+                let self = this
+                self.selected_student = params
+                console.log(params)
+                $('#editStudent').modal('show')
+            },
+            setStudent(params, role) {
+                axios.post(' https://vote-rush.herokuapp.com/api/crudCandidate', {
+                    position_id: role,
+                    user_id: params.id
+                  })
+                  .then(function (response) {
+                    alert('Success')
+                    console.log(response);
+                  })
+                  .catch(function (error) {
+                    console.log(error);
+                  })
+            },
+            setActive() {
+                return false
+            },
+            onFalseOn() {
+                this.is_candidate_page = false
+                this.is_student_page = false
+                this.is_admin_page = false
+            },
+            onActive(id) {
+                console.log(id)
+                if (id == 1) {
+                    this.onFalseOn()
+                    this.is_candidate_page = true
+                }
+                if (id == 0) {
+                    this.onFalseOn()
+                    this.is_student_page = true
+                }
+                if (id == 2) {
+                    this.onFalseOn()
+                    this.is_admin_page = true
+                }
+                for (var i = 0; i <= 3; i++) {
+                    console.log(i)
+                    this.array_link[i] = false
+                }
+                let self = this
+                self.array_link[id] = true
+                // console.log(this.array_link[id])
+                // return true
+            }
+
+        }
+    })
+</script>
+
+
+<style type="text/css">
+    .container-fluid {
+        height: 100vh;
+        background: #fff;
+    }
+</style>
